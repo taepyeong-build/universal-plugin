@@ -89,9 +89,10 @@ def _validate_plugin_spec(spec: Dict[str, Any], expected_name: str) -> None:
     if name != expected_name:
         raise ValueError(f"spec/plugin.json name '{name}' does not match registry name '{expected_name}'.")
     if not SLUG_RE.match(name):
-        raise ValueError(f"Invalid plugin name '{name}'.")
-    if not SEMVER_RE.match(str(spec.get("version", ""))):
-        raise ValueError(f"Plugin '{name}' version must be SemVer X.Y.Z.")
+        raise ValueError(f"Invalid plugin name '{name}' (must match ^[a-z0-9][a-z0-9-]{{0,63}}$).")
+    version = str(spec.get("version", ""))
+    if not SEMVER_RE.match(version):
+        raise ValueError(f"Plugin '{name}' version must be SemVer X.Y.Z, got '{version}'.")
 
 
 def _render_root_plugin_json(spec: Dict[str, Any]) -> Dict[str, Any]:
@@ -147,10 +148,10 @@ def _render_claude_plugin_json(spec: Dict[str, Any], has_hooks: bool) -> Dict[st
     return out
 
 
-def _render_mcp_files(mcp_spec: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+def _render_mcp_files(mcp_spec: Dict[str, Any], plugin_name: str) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
     servers = mcp_spec.get("servers", {})
     if not isinstance(servers, dict) or not servers:
-        raise ValueError("spec/mcp.json must declare at least one server in 'servers'.")
+        raise ValueError(f"Plugin '{plugin_name}' spec/mcp.json must declare at least one server in 'servers'.")
 
     agent_plugins_servers: Dict[str, Any] = {}
     agy_legacy_servers: Dict[str, Any] = {}
@@ -160,12 +161,12 @@ def _render_mcp_files(mcp_spec: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[st
         transport = cfg.get("transport")
         if transport not in {"stdio", "streamable-http"}:
             raise ValueError(
-                f"MCP server '{srv_name}' uses unsupported transport '{transport}'. Use 'stdio' or 'streamable-http'."
+                f"Plugin '{plugin_name}' MCP server '{srv_name}' uses unsupported transport '{transport}'. Use 'stdio' or 'streamable-http'."
             )
 
         if transport == "stdio":
             if not cfg.get("command"):
-                raise ValueError(f"Stdio MCP server '{srv_name}' requires 'command'.")
+                raise ValueError(f"Plugin '{plugin_name}' stdio MCP server '{srv_name}' requires 'command'.")
             base: Dict[str, Any] = {"command": cfg["command"]}
             if cfg.get("args"):
                 base["args"] = cfg["args"]
@@ -183,7 +184,7 @@ def _render_mcp_files(mcp_spec: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[st
             )
         else:
             if not cfg.get("url"):
-                raise ValueError(f"HTTP MCP server '{srv_name}' requires 'url'.")
+                raise ValueError(f"Plugin '{plugin_name}' HTTP MCP server '{srv_name}' requires 'url'.")
             agent_plugins_servers[srv_name] = {"type": "streamable-http", "url": cfg["url"]}
             agy_legacy_servers[srv_name] = {"url": cfg["url"]}
             claude_servers[srv_name] = {"type": "http", "url": cfg["url"]}
@@ -358,7 +359,7 @@ def build_expected_files(repo_root: pathlib.Path) -> Tuple[Dict[pathlib.Path, st
         # 2. Optional MCP adapters
         mcp_targets = [pdir / "mcp.json", pdir / "mcp_config.json", pdir / ".mcp.json"]
         if has_mcp:
-            mcp_json, mcp_cfg, dot_mcp = _render_mcp_files(_load_json(mcp_spec_path))
+            mcp_json, mcp_cfg, dot_mcp = _render_mcp_files(_load_json(mcp_spec_path), name)
             expected[pdir / "mcp.json"] = _dump_json(mcp_json)
             expected[pdir / "mcp_config.json"] = _dump_json(mcp_cfg)
             expected[pdir / ".mcp.json"] = _dump_json(dot_mcp)
@@ -452,13 +453,14 @@ def main() -> int:
     args = parser.parse_args()
 
     expected, cleanup = build_expected_files(REPO_ROOT)
-    drifted: List[str] = []
+    updated: List[str] = []
+    removed: List[str] = []
 
     for path, content in sorted(expected.items()):
         rel = str(path.relative_to(REPO_ROOT))
         current = path.read_text(encoding="utf-8") if path.is_file() else None
         if current != content:
-            drifted.append(rel)
+            updated.append(rel)
             if not args.check:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(content, encoding="utf-8")
@@ -466,10 +468,11 @@ def main() -> int:
     for stale in cleanup:
         if stale.is_file():
             rel = str(stale.relative_to(REPO_ROOT))
-            drifted.append(f"{rel} (stale)")
+            removed.append(f"{rel} (stale)")
             if not args.check:
                 stale.unlink()
 
+    drifted = updated + removed
     if args.check:
         if drifted:
             print("SSOT drift detected. Run `python3 tools/sync.py` to regenerate:", file=sys.stderr)
@@ -479,7 +482,7 @@ def main() -> int:
         print(f"OK: {len(expected)} generated files are in sync with canonical specs.")
         return 0
 
-    print(f"Synced {len(expected)} generated files ({len(drifted)} updated).")
+    print(f"Synced {len(expected)} generated files ({len(updated)} updated, {len(removed)} removed).")
     return 0
 
 

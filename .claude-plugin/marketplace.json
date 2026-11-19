@@ -1,21 +1,21 @@
 {
   "name": "universal-plugins",
-  "description": "Cross-CLI compatible agent plugins engineered for Claude Code, Codex CLI, and Antigravity CLI from a single source of truth.",
+  "description": "Single-source-of-truth agent plugins for Claude Code, Codex CLI, and Antigravity CLI.",
   "version": "1.0.0",
   "owner": {
     "name": "taepyeong-build",
-    "email": "platform@example.com"
+    "email": "taepyeong.build@gmail.com"
   },
   "plugins": [
     {
       "name": "expert-kit",
-      "description": "Principal-grade architecture review skills, deterministic safety and quality hooks, context budget MCP diagnostics, and portable review subagents compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+      "description": "7-dimension architecture review skill, deterministic shell and stop hooks, stdio context-budget MCP server, and read-only review subagent for Claude Code, Codex CLI, and Antigravity CLI.",
       "version": "1.0.0",
       "source": "./plugins/expert-kit"
     },
     {
       "name": "writing-kit",
-      "description": "World-class writing skill engineered around an 8-dimension expert competency rubric (W1-W8), adaptive author elicitation, zero-dependency Korean/English deterministic prose auditing, four progressive-disclosure genre profiles, and an independent read-only editorial critic compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+      "description": "W1-W8 writing workflow, 4 on-demand genre profiles, zero-dependency Korean/English prose auditor, and read-only editorial critic for Claude Code, Codex CLI, and Antigravity CLI.",
       "version": "1.0.0",
       "source": "./plugins/writing-kit"
     }

@@ -26,20 +26,31 @@ def _write_json(path: pathlib.Path, data: dict) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Scaffold a new cross-CLI plugin (modular 5-component opt-in).")
-    parser.add_argument("name", help="Lowercase hyphenated plugin name (e.g. security-kit)")
-    parser.add_argument("--description", required=True, help="Concise plugin description (>= 10 chars)")
-    parser.add_argument("--category", default="Developer Tools", help="Marketplace category")
-    parser.add_argument("--with-hooks", action="store_true", help="Include canonical hooks spec")
-    parser.add_argument("--with-mcp", action="store_true", help="Include canonical MCP spec")
-    parser.add_argument("--with-agents", action="store_true", help="Include canonical subagent spec")
-    parser.add_argument("--with-evals", action="store_true", help="Include behavioral eval scaffold")
-    parser.add_argument("--full", action="store_true", help="Enable all optional components")
+    parser = argparse.ArgumentParser(
+        description="Scaffold a new cross-CLI plugin (core skills and rules plus optional hooks, MCP, subagents, and evals)."
+    )
+    parser.add_argument(
+        "name",
+        help="Lowercase hyphenated plugin slug (1-64 chars: a-z, 0-9, hyphens; e.g. security-kit).",
+    )
+    parser.add_argument("--description", required=True, help="Concise plugin description (at least 10 characters).")
+    parser.add_argument("--category", default="Developer Tools", help="Marketplace category (default: Developer Tools).")
+    parser.add_argument("--with-hooks", action="store_true", help="Include canonical hooks spec and hook runtime.")
+    parser.add_argument("--with-mcp", action="store_true", help="Include canonical MCP spec and stdio server.")
+    parser.add_argument("--with-agents", action="store_true", help="Include canonical read-only subagent spec.")
+    parser.add_argument("--with-evals", action="store_true", help="Include starter L3 behavioral eval scaffold.")
+    parser.add_argument("--full", action="store_true", help="Enable all optional components (hooks, MCP, subagents, evals).")
     args = parser.parse_args()
 
     if not SLUG_RE.match(args.name):
-        print(f"Error: invalid plugin slug '{args.name}' (use lowercase a-z, 0-9, hyphens).", file=sys.stderr)
+        print(f"Error: invalid plugin slug '{args.name}' (use 1-64 lowercase a-z, 0-9, or hyphens).", file=sys.stderr)
         return 2
+
+    desc_clean = args.description.strip()
+    if len(desc_clean) < 10:
+        print("Error: --description must be at least 10 characters.", file=sys.stderr)
+        return 2
+    desc_sentence = desc_clean.rstrip(".") + "."
 
     pdir = REPO_ROOT / "plugins" / args.name
     if pdir.exists():
@@ -65,7 +76,7 @@ def main() -> int:
             "name": args.name,
             "displayName": display_name,
             "version": "0.1.0",
-            "description": args.description,
+            "description": desc_sentence,
             "author": {"name": registry["marketplace"]["owner"]["name"], "url": owner_url},
             "homepage": repo_url,
             "repository": repo_url,
@@ -98,16 +109,18 @@ def main() -> int:
 
     (pdir / "README.md").write_text(
         f"# {display_name}\n\n"
-        f"{args.description} This cross-CLI plugin is authored from a single canonical specification "
-        f"under `spec/` and compiled into zero-collision adapters for Claude Code, Codex CLI, and "
-        f"Antigravity CLI without external runtime dependencies.\n\n"
+        f"{desc_sentence} Built from canonical specs under `spec/` for **Claude Code**, "
+        f"**Codex CLI**, and **Antigravity CLI** with Python 3.9+ and zero third-party packages.\n\n"
         f"## Installation\n\n"
         f"### Claude Code\n"
         f"```text\n/plugin install {args.name} --marketplace {repo_slug}\n```\n\n"
         f"### Codex CLI\n"
         f"```bash\ncodex plugin marketplace add {repo_url}\ncodex plugin add {args.name}@{mp_name}\n```\n\n"
         f"### Antigravity CLI\n"
-        f"```bash\nagy plugin install {repo_url}/tree/{repo_branch}/plugins/{args.name}\n```\n",
+        f"```bash\nagy plugin install {repo_url}/tree/{repo_branch}/plugins/{args.name}\n```\n\n"
+        f"## Verification\n\n"
+        f"Run the self-diagnostic check from `plugins/{args.name}` (Python 3.9+):\n\n"
+        f"```bash\ncd plugins/{args.name}\npython3 core/doctor.py --ci\n```\n",
         encoding="utf-8",
     )
 
@@ -191,7 +204,10 @@ def main() -> int:
 
     # Run sync.py immediately
     subprocess.run([sys.executable, str(REPO_ROOT / "tools" / "sync.py")], check=True)
-    print(f"Scaffolded and synced plugin: plugins/{args.name}")
+    print(
+        f"Scaffolded and synced plugins/{args.name}. "
+        f"Next: customize plugins/{args.name}/README.md and run python3 tools/verify.py."
+    )
     return 0
 
 

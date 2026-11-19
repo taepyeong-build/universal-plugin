@@ -30,10 +30,16 @@ UNQUOTED_ROOT_RE = re.compile(r'(?<!")\$\{(?:CLAUDE_PLUGIN_ROOT|CLAUDE_PLUGIN_DA
 def _check_png(path: pathlib.Path) -> List[Dict[str, str]]:
     issues: List[Dict[str, str]] = []
     if not path.is_file():
-        return [{"severity": "error", "check": "icon", "message": f"Missing icon file: {path.name}"}]
+        return [
+            {
+                "severity": "error",
+                "check": "icon",
+                "message": f"Missing icon file: assets/{path.name} (generate one with `python3 tools/icon.py`).",
+            }
+        ]
     raw = path.read_bytes()
     if len(raw) > MAX_ICON_BYTES:
-        issues.append({"severity": "error", "check": "icon", "message": f"Icon exceeds 2 MB: {len(raw)} bytes"})
+        issues.append({"severity": "error", "check": "icon", "message": f"Icon exceeds 2 MB ({len(raw)} bytes)."})
     if len(raw) < 24 or raw[:8] != b"\x89PNG\r\n\x1a\n" or raw[12:16] != b"IHDR":
         issues.append({"severity": "error", "check": "icon", "message": "Icon is not a valid PNG file."})
         return issues
@@ -67,7 +73,7 @@ def run_diagnostics(plugin_root: pathlib.Path) -> Dict[str, Any]:
             {
                 "severity": "error",
                 "check": "python",
-                "message": f"Python 3.9+ required, got {sys.version.split()[0]}",
+                "message": f"Python 3.9+ required, got {sys.version.split()[0]}.",
             }
         )
 
@@ -90,7 +96,7 @@ def run_diagnostics(plugin_root: pathlib.Path) -> Dict[str, Any]:
                 {
                     "severity": "error",
                     "check": "context-budget",
-                    "message": f"rules/AGENTS.md is {size} bytes (> {RULE_HARD_CAP_BYTES} hard limit).",
+                    "message": f"rules/AGENTS.md is {size} bytes (> {RULE_HARD_CAP_BYTES} bytes hard limit).",
                 }
             )
         elif size > RULE_WARN_CAP_BYTES:
@@ -98,7 +104,7 @@ def run_diagnostics(plugin_root: pathlib.Path) -> Dict[str, Any]:
                 {
                     "severity": "warning",
                     "check": "context-budget",
-                    "message": f"rules/AGENTS.md is {size} bytes (> {RULE_WARN_CAP_BYTES} recommended ~2,000-token budget).",
+                    "message": f"rules/AGENTS.md is {size} bytes (> {RULE_WARN_CAP_BYTES} bytes recommended ~2,000-token budget).",
                 }
             )
 
@@ -128,7 +134,7 @@ def run_diagnostics(plugin_root: pathlib.Path) -> Dict[str, Any]:
                             {
                                 "severity": "error",
                                 "check": "hook-quoting",
-                                "message": f"Unquoted plugin path variable in .claude-plugin/hooks.json ({event_name}): {cmd}",
+                                "message": f"Unquoted plugin path variable in .claude-plugin/hooks.json ({event_name}): {cmd}. Re-run `python3 tools/sync.py` to regenerate quoted commands.",
                             }
                         )
 
@@ -143,7 +149,7 @@ def run_diagnostics(plugin_root: pathlib.Path) -> Dict[str, Any]:
                         {
                             "severity": "error",
                             "check": "mcp-transport",
-                            "message": f"{mcp_name} server '{srv_name}' uses legacy SSE transport (unsupported by Antigravity).",
+                            "message": f"{mcp_name} server '{srv_name}' uses legacy SSE transport (unsupported by Antigravity); switch to 'stdio' or 'streamable-http' in spec/mcp.json.",
                         }
                     )
 
@@ -212,9 +218,13 @@ def run_diagnostics(plugin_root: pathlib.Path) -> Dict[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Expert Kit plugin self-diagnostic doctor")
-    parser.add_argument("--root", default=str(pathlib.Path(__file__).resolve().parents[1]))
-    parser.add_argument("--ci", action="store_true", help="Fail on warnings as well as errors")
+    parser = argparse.ArgumentParser(description="Cross-CLI plugin self-diagnostic doctor.")
+    parser.add_argument(
+        "--root",
+        default=str(pathlib.Path(__file__).resolve().parents[1]),
+        help="Plugin root directory to inspect (defaults to this plugin root).",
+    )
+    parser.add_argument("--ci", action="store_true", help="Exit non-zero on warnings as well as errors.")
     args = parser.parse_args()
 
     report = run_diagnostics(pathlib.Path(args.root).resolve())

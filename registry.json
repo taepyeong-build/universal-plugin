@@ -3,11 +3,11 @@
   "marketplace": {
     "name": "universal-plugins",
     "displayName": "Universal Expert Plugins",
-    "description": "Cross-CLI compatible agent plugins engineered for Claude Code, Codex CLI, and Antigravity CLI from a single source of truth.",
+    "description": "Single-source-of-truth agent plugins for Claude Code, Codex CLI, and Antigravity CLI.",
     "version": "1.0.0",
     "owner": {
       "name": "taepyeong-build",
-      "email": "platform@example.com",
+      "email": "taepyeong.build@gmail.com",
       "url": "https://github.com/taepyeong-build"
     },
     "repository": {

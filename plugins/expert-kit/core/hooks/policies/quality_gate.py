@@ -38,15 +38,16 @@ def evaluate(
     except subprocess.TimeoutExpired:
         return PolicyDecision(
             verdict="continue",
-            reason=f"Stop quality gate command timed out: {check_cmd}",
+            reason=f"Stop quality gate (EXPERT_KIT_STOP_CHECK_CMD) timed out after 10s: {check_cmd}.",
         )
 
     if result.returncode != 0:
         summary = (result.stderr or result.stdout or "").strip().splitlines()
-        tail = summary[-1] if summary else f"exit status {result.returncode}"
+        tail = summary[-1].rstrip(".") if summary else ""
+        detail = f": {tail}" if tail else ""
         return PolicyDecision(
             verdict="continue",
-            reason=f"Quality gate failed ({check_cmd}): {tail}. Fix before finishing.",
+            reason=f"Stop quality gate (EXPERT_KIT_STOP_CHECK_CMD) exited {result.returncode} ({check_cmd}){detail}. Fix before finishing.",
         )
 
     return PolicyDecision(verdict="allow")

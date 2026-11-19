@@ -30,25 +30,43 @@ def _run(cmd: List[str], env: Dict[str, str] | None = None, cwd: pathlib.Path = 
 
 def _check_marketplace_structures(registry: Dict) -> Tuple[bool, str]:
     expected_names = [p["name"] for p in registry["plugins"]]
+    expected_paths = {p["name"]: f"./{p['path']}" for p in registry["plugins"]}
     agy_mp = json.loads((REPO_ROOT / "marketplace.json").read_text(encoding="utf-8"))
     codex_mp = json.loads((REPO_ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8"))
+    claude_mp = json.loads((REPO_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
 
     agy_names = [p["name"] for p in agy_mp.get("plugins", [])]
     codex_names = [p["name"] for p in codex_mp.get("plugins", [])]
-    if agy_names != expected_names or codex_names != expected_names:
-        return False, f"Marketplace plugin lists diverge: registry={expected_names}, agy={agy_names}, codex={codex_names}"
+    claude_names = [p["name"] for p in claude_mp.get("plugins", [])]
+    if agy_names != expected_names or codex_names != expected_names or claude_names != expected_names:
+        return (
+            False,
+            f"Marketplace plugin lists diverge: registry={expected_names}, agy={agy_names}, codex={codex_names}, claude={claude_names}",
+        )
 
     for p in agy_mp.get("plugins", []):
         url = p.get("source", {}).get("url", "")
         if not url.startswith("https://"):
-            return False, f"Antigravity marketplace.json plugin '{p.get('name')}' requires an https:// source.url"
+            return False, f"Antigravity marketplace.json plugin '{p.get('name')}' requires an https:// source.url."
 
-    return True, "All 3 marketplace manifests structurally consistent with registry.json"
+    for p in claude_mp.get("plugins", []):
+        src = p.get("source", "")
+        want = expected_paths.get(p.get("name", ""), "")
+        if src != want:
+            return False, f"Claude marketplace.json plugin '{p.get('name')}' source '{src}' does not match '{want}'."
+
+    return True, "All 3 marketplace manifests structurally consistent with registry.json."
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run 3-layer cross-CLI plugin verification.")
-    parser.add_argument("--with-evals", action="store_true", help="Also run L3 behavioral evals (uses LLM tokens).")
+    parser = argparse.ArgumentParser(
+        description="Run 3-layer cross-CLI plugin verification (L1: SSOT/3-CLI strict, L2: tests/doctor, L3: opt-in evals)."
+    )
+    parser.add_argument(
+        "--with-evals",
+        action="store_true",
+        help="Also run L3 behavioral evals via the claude CLI (spends LLM tokens).",
+    )
     args = parser.parse_args()
 
     registry = json.loads((REPO_ROOT / "registry.json").read_text(encoding="utf-8"))
@@ -157,16 +175,20 @@ def main() -> int:
 
     # --- L3: Behavioral Evals (Opt-in) ---
     if args.with_evals:
-        for entry in plugins:
-            name = entry["name"]
-            pdir = REPO_ROOT / entry["path"]
-            evals_dir = pdir / "evals"
-            if evals_dir.is_dir() and has_claude:
-                rc, out, err = _run(["claude", "plugin", "eval", "--trust-plugin", str(pdir)])
-                record(f"L3.claude-eval[{name}]", rc == 0, (out or err).strip()[:300])
+        if not has_claude:
+            record("L3.claude-eval", False, "claude CLI not found on PATH; cannot run L3 evals.")
+        else:
+            for entry in plugins:
+                name = entry["name"]
+                pdir = REPO_ROOT / entry["path"]
+                evals_dir = pdir / "evals"
+                if evals_dir.is_dir():
+                    rc, out, err = _run(["claude", "plugin", "eval", "--trust-plugin", str(pdir)])
+                    record(f"L3.claude-eval[{name}]", rc == 0, (out or err).strip()[:300])
     else:
         eval_cases = sum(len(list((REPO_ROOT / e["path"] / "evals").glob("*/prompt.md"))) for e in plugins if (REPO_ROOT / e["path"] / "evals").is_dir())
-        print(f"[INFO] L3.evals skipped (run with --with-evals; {eval_cases} behavioral eval case(s) ready).")
+        case_word = "case" if eval_cases == 1 else "cases"
+        print(f"[INFO] L3.evals skipped (run with --with-evals; {eval_cases} behavioral eval {case_word} ready).")
 
     failed = [r for r in results if not r[1]]
     print(f"\nVerification summary: {len(results) - len(failed)}/{len(results)} gates passed.")

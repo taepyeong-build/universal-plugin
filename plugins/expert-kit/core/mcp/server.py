@@ -20,7 +20,7 @@ SERVER_INFO = {"name": "expert-diagnostics", "version": "1.0.0"}
 TOOLS: List[Dict[str, Any]] = [
     {
         "name": "plugin_diagnostics",
-        "description": "Return Expert Kit plugin health, active components, and context-budget audit results.",
+        "description": "Return plugin health, active components, and context-budget audit results.",
         "inputSchema": {
             "type": "object",
             "properties": {},

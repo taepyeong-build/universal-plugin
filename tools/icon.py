@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
+import argparse
 import pathlib
 import struct
-import sys
 import zlib
 
 
@@ -79,12 +79,14 @@ def generate_icon_png(output_path: pathlib.Path, size: int = 512) -> None:
 
 
 def main() -> int:
-    if len(sys.argv) < 2:
-        print("Usage: python3 tools/icon.py <output.png>", file=sys.stderr)
-        return 2
-    out = pathlib.Path(sys.argv[1])
-    generate_icon_png(out)
-    print(f"Generated 512x512 icon: {out} ({out.stat().st_size} bytes)")
+    parser = argparse.ArgumentParser(description="Generate a square RGB PNG plugin icon (Python stdlib only).")
+    parser.add_argument("output", help="Destination path for the generated PNG file.")
+    parser.add_argument("--size", type=int, default=512, help="Square pixel dimension between 512 and 2048 (default: 512).")
+    args = parser.parse_args()
+
+    out = pathlib.Path(args.output)
+    generate_icon_png(out, size=args.size)
+    print(f"Generated {args.size}x{args.size} icon: {out} ({out.stat().st_size} bytes)")
     return 0
 
 

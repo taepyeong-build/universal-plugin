@@ -79,8 +79,8 @@ def run_dispatch(policy_name: str, raw_stdin: str) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Expert Kit Universal Hook Adapter")
-    parser.add_argument("--policy", required=True, choices=sorted(POLICIES.keys()))
+    parser = argparse.ArgumentParser(description="Universal Hook Adapter.")
+    parser.add_argument("--policy", required=True, choices=sorted(POLICIES.keys()), help="Hook policy to execute.")
     args = parser.parse_args()
     raw_stdin = sys.stdin.read()
     return run_dispatch(args.policy, raw_stdin)

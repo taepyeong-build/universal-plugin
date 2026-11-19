@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "writing-kit",
   "version": "1.0.0",
-  "description": "World-class writing skill engineered around an 8-dimension expert competency rubric (W1-W8), adaptive author elicitation, zero-dependency Korean/English deterministic prose auditing, four progressive-disclosure genre profiles, and an independent read-only editorial critic compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+  "description": "W1-W8 writing workflow, 4 on-demand genre profiles, zero-dependency Korean/English prose auditor, and read-only editorial critic for Claude Code, Codex CLI, and Antigravity CLI.",
   "author": {
     "name": "taepyeong-build",
     "url": "https://github.com/taepyeong-build"

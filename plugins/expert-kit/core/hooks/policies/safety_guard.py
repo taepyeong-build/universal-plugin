@@ -10,11 +10,11 @@ from ..normalizer import CanonicalEvent, PolicyDecision
 DENY_PATTERNS: List[Tuple[re.Pattern[str], str]] = [
     (
         re.compile(r"(^|[;&|\s])rm\s+-[a-zA-Z]*r[a-zA-Z]*f[a-zA-Z]*\s+(/($|\s)|/\*|~($|/))"),
-        "Blocked catastrophic recursive deletion targeting root or home directory.",
+        "Blocked recursive deletion targeting root or home directory.",
     ),
     (
         re.compile(r"(^|[;&|\s])rm\s+-[a-zA-Z]*f[a-zA-Z]*r[a-zA-Z]*\s+(/($|\s)|/\*|~($|/))"),
-        "Blocked catastrophic recursive deletion targeting root or home directory.",
+        "Blocked recursive deletion targeting root or home directory.",
     ),
     (
         re.compile(r"(^|[;&|\s])(mkfs(\.[a-z0-9]+)?|dd\s+if=.*of=/dev/)"),
@@ -30,22 +30,22 @@ DENY_PATTERNS: List[Tuple[re.Pattern[str], str]] = [
     ),
     (
         re.compile(r"\b(curl|wget)\b[^\n]*\|\s*(sh|bash|zsh)\b"),
-        "Blocked remote script piping directly into a shell interpreter.",
+        "Blocked piping a remote script into a shell; download and inspect it first.",
     ),
 ]
 
 ASK_PATTERNS: List[Tuple[re.Pattern[str], str]] = [
     (
         re.compile(r"\bgit\s+reset\s+--hard\b"),
-        "Hard reset discards uncommitted changes; explicit confirmation required.",
+        "`git reset --hard` discards uncommitted changes; explicit confirmation required.",
     ),
     (
         re.compile(r"\bgit\s+clean\s+-[a-zA-Z]*f"),
-        "git clean permanently deletes untracked files; explicit confirmation required.",
+        "`git clean -f` permanently deletes untracked files; explicit confirmation required.",
     ),
     (
         re.compile(r"\bchmod\s+(-R\s+)?777\b"),
-        "World-writable permissions (777) weaken security boundaries; confirm intent.",
+        "`chmod 777` grants read, write, and execute access to all local users; explicit confirmation required.",
     ),
 ]
 
