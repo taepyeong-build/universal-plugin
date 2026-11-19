@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../schemas/plugin-spec.schema.json",
+  "name": "writing-kit",
+  "displayName": "Writing Kit",
+  "version": "1.0.0",
+  "description": "World-class writing skill engineered around an 8-dimension expert competency rubric (W1-W8), adaptive author elicitation, zero-dependency Korean/English deterministic prose auditing, four progressive-disclosure genre profiles, and an independent read-only editorial critic compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+  "author": {
+    "name": "taepyeong-build",
+    "url": "https://github.com/taepyeong-build"
+  },
+  "homepage": "https://github.com/taepyeong-build/universal-plugin",
+  "repository": "https://github.com/taepyeong-build/universal-plugin",
+  "license": "MIT",
+  "keywords": ["writing", "editorial", "korean", "prose-audit", "rubric", "cross-cli"],
+  "icon": "assets/icon.png",
+  "category": "Productivity"
+}

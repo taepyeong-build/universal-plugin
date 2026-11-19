@@ -25,6 +25,15 @@
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
       }
+    },
+    {
+      "name": "writing-kit",
+      "path": "plugins/writing-kit",
+      "category": "Productivity",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      }
     }
   ]
 }

@@ -10,6 +10,14 @@
       "source": {
         "url": "https://github.com/taepyeong-build/universal-plugin/tree/main/plugins/expert-kit"
       }
+    },
+    {
+      "name": "writing-kit",
+      "description": "World-class writing skill engineered around an 8-dimension expert competency rubric (W1-W8), adaptive author elicitation, zero-dependency Korean/English deterministic prose auditing, four progressive-disclosure genre profiles, and an independent read-only editorial critic compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+      "version": "1.0.0",
+      "source": {
+        "url": "https://github.com/taepyeong-build/universal-plugin/tree/main/plugins/writing-kit"
+      }
     }
   ]
 }
