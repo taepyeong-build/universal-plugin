@@ -1,0 +1,15 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "expert-diagnostics": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "${PLUGIN_ROOT}/core/mcp/server.py"
+      ],
+      "env": {
+        "EXPERT_KIT_DATA": "${PLUGIN_DATA}"
+      }
+    }
+  }
+}

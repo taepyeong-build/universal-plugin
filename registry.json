@@ -1,0 +1,30 @@
+{
+  "$schema": "./schemas/registry.schema.json",
+  "marketplace": {
+    "name": "universal-plugins",
+    "displayName": "Universal Expert Plugins",
+    "description": "Cross-CLI compatible agent plugins engineered for Claude Code, Codex CLI, and Antigravity CLI from a single source of truth.",
+    "version": "1.0.0",
+    "owner": {
+      "name": "taepyeong-build",
+      "email": "platform@example.com",
+      "url": "https://github.com/taepyeong-build"
+    },
+    "repository": {
+      "slug": "taepyeong-build/universal-plugin",
+      "url": "https://github.com/taepyeong-build/universal-plugin",
+      "branch": "main"
+    }
+  },
+  "plugins": [
+    {
+      "name": "expert-kit",
+      "path": "plugins/expert-kit",
+      "category": "Developer Tools",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      }
+    }
+  ]
+}

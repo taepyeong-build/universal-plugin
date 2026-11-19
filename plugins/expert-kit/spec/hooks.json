@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../schemas/hooks-spec.schema.json",
+  "groups": [
+    {
+      "name": "session-context",
+      "enabled": true,
+      "rules": [
+        {
+          "event": "session.start",
+          "policy": "session_context",
+          "timeoutSec": 5,
+          "runtimes": ["claude", "codex"]
+        }
+      ]
+    },
+    {
+      "name": "safety-guard",
+      "enabled": true,
+      "rules": [
+        {
+          "event": "tool.before",
+          "actions": ["shell.exec"],
+          "policy": "safety_guard",
+          "timeoutSec": 10
+        }
+      ]
+    },
+    {
+      "name": "quality-gate",
+      "enabled": true,
+      "rules": [
+        {
+          "event": "turn.stop",
+          "policy": "quality_gate",
+          "timeoutSec": 15
+        }
+      ]
+    }
+  ]
+}

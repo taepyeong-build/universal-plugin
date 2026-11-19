@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "expert-kit",
+  "version": "1.0.0",
+  "description": "Principal-grade architecture review skills, deterministic safety and quality hooks, context budget MCP diagnostics, and portable review subagents compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+  "author": {
+    "name": "taepyeong-build",
+    "url": "https://github.com/taepyeong-build"
+  },
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "review",
+    "guardrails",
+    "mcp",
+    "cross-cli"
+  ],
+  "homepage": "https://github.com/taepyeong-build/universal-plugin",
+  "repository": "https://github.com/taepyeong-build/universal-plugin",
+  "logo": "assets/icon.png",
+  "extensions": {
+    "com.openai": {
+      "displayName": "Expert Kit",
+      "category": "Developer Tools",
+      "icon": "assets/icon.png"
+    }
+  }
+}

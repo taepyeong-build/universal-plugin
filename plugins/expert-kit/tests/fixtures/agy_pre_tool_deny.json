@@ -1,0 +1,14 @@
+{
+  "conversationId": "conv-agy-001",
+  "workspacePaths": ["/tmp/workspace"],
+  "hookEventName": "PreToolUse",
+  "cwd": "/tmp/workspace",
+  "stepIdx": 4,
+  "toolCall": {
+    "id": "toolu_01",
+    "name": "run_command",
+    "args": {
+      "CommandLine": "rm -rf /"
+    }
+  }
+}

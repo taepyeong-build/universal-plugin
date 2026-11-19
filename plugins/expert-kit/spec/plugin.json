@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../schemas/plugin-spec.schema.json",
+  "name": "expert-kit",
+  "displayName": "Expert Kit",
+  "version": "1.0.0",
+  "description": "Principal-grade architecture review skills, deterministic safety and quality hooks, context budget MCP diagnostics, and portable review subagents compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+  "author": {
+    "name": "taepyeong-build",
+    "url": "https://github.com/taepyeong-build"
+  },
+  "homepage": "https://github.com/taepyeong-build/universal-plugin",
+  "repository": "https://github.com/taepyeong-build/universal-plugin",
+  "license": "MIT",
+  "keywords": ["architecture", "review", "guardrails", "mcp", "cross-cli"],
+  "icon": "assets/icon.png",
+  "category": "Developer Tools"
+}

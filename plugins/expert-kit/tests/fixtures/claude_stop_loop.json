@@ -1,0 +1,6 @@
+{
+  "session_id": "sess-claude-002",
+  "hook_event_name": "Stop",
+  "cwd": "/tmp/workspace",
+  "stop_hook_active": true
+}

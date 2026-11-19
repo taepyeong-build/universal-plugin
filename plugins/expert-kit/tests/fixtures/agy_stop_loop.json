@@ -1,0 +1,8 @@
+{
+  "conversationId": "conv-agy-002",
+  "hookEventName": "Stop",
+  "cwd": "/tmp/workspace",
+  "executionNum": 1,
+  "terminationReason": "NO_TOOL_CALL",
+  "continuationActive": true
+}

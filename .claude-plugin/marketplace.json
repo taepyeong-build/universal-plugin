@@ -1,0 +1,17 @@
+{
+  "name": "universal-plugins",
+  "description": "Cross-CLI compatible agent plugins engineered for Claude Code, Codex CLI, and Antigravity CLI from a single source of truth.",
+  "version": "1.0.0",
+  "owner": {
+    "name": "taepyeong-build",
+    "email": "platform@example.com"
+  },
+  "plugins": [
+    {
+      "name": "expert-kit",
+      "description": "Principal-grade architecture review skills, deterministic safety and quality hooks, context budget MCP diagnostics, and portable review subagents compatible with Claude Code, Codex CLI, and Antigravity CLI.",
+      "version": "1.0.0",
+      "source": "./plugins/expert-kit"
+    }
+  ]
+}

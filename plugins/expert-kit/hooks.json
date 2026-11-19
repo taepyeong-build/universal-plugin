@@ -1,0 +1,25 @@
+{
+  "safety-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./core/hooks/dispatch.py --policy safety_guard",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "quality-gate": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python3 ./core/hooks/dispatch.py --policy quality_gate",
+        "timeout": 15
+      }
+    ]
+  }
+}
