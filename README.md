@@ -1,5 +1,7 @@
 # Universal Expert Plugins
 
+> [한국어 요약 안내 (README.ko.md)](./README.ko.md)
+
 This monorepo builds and verifies zero-dependency agent plugins for **Claude Code**, **Codex CLI**, and **Antigravity CLI** (`claude`, `codex`, `agy`) from a single canonical specification. Every runtime script requires Python 3.9+ and zero third-party packages.
 
 ## Plugins
